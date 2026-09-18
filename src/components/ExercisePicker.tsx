@@ -14,9 +14,17 @@ export function ExercisePicker({ visible, onClose, onPick }: Props) {
   const [newName, setNewName] = useState('');
   const [newMuscles, setNewMuscles] = useState<Muscle[]>([]);
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (visible) listExercises(db).then(setExercises, (e) => setError(String(e)));
+    if (!visible) return;
+    listExercises(db).then(
+      (list) => {
+        setExercises(list);
+        setError(''); // drop a stale error from a previous open
+      },
+      (e) => setError(String(e))
+    );
   }, [db, visible]);
 
   const q = query.trim().toLowerCase();
@@ -29,6 +37,8 @@ export function ExercisePicker({ visible, onClose, onPick }: Props) {
   }
 
   async function onSave() {
+    if (saving) return; // a double-tap would hit UNIQUE and report a false duplicate
+    setSaving(true);
     try {
       const id = await addExercise(db, newName, newMuscles);
       onPick({ id, name: newName.trim(), muscles: newMuscles });
@@ -37,6 +47,8 @@ export function ExercisePicker({ visible, onClose, onPick }: Props) {
       setError('');
     } catch (e) {
       setError(String(e).includes('UNIQUE') ? 'Exercise already exists' : e instanceof Error ? e.message : String(e));
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -88,7 +100,11 @@ export function ExercisePicker({ visible, onClose, onPick }: Props) {
             })}
           </View>
           {error ? <Text style={styles.error}>{error}</Text> : null}
-          <Pressable style={styles.button} onPress={onSave} accessibilityRole="button">
+          <Pressable
+            style={[styles.button, saving && styles.disabled]}
+            onPress={onSave}
+            disabled={saving}
+            accessibilityRole="button">
             <Text style={styles.buttonText}>Save & add</Text>
           </Pressable>
         </View>
@@ -113,6 +129,7 @@ const styles = StyleSheet.create({
   chipOn: { backgroundColor: '#216e39', borderColor: '#216e39' },
   chipTextOn: { color: '#fff' },
   error: { color: '#c00' },
+  disabled: { opacity: 0.5 },
   button: { backgroundColor: '#216e39', padding: 12, borderRadius: 8, alignItems: 'center' },
   buttonText: { color: '#fff', fontWeight: '600' },
 });

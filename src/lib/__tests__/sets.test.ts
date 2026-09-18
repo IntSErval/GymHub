@@ -19,6 +19,12 @@ describe('parseSet', () => {
     expect(parseSet(' 60 ', ' 8 ', ' ')).toEqual({ ok: true, value: { kg: 60, reps: 8, rpe: null } });
   });
 
+  it('rejects grouped numbers instead of reading them small', () => {
+    expect(parseSet('1,000', '8', '').ok).toBe(false);
+    expect(parseSet('60', '1,000', '').ok).toBe(false);
+    expect(parseSet('1,0,0', '8', '').ok).toBe(false);
+  });
+
   it('rejects bad kg', () => {
     expect(parseSet('', '8', '')).toEqual({ ok: false, error: 'Enter kg' });
     expect(parseSet('-5', '8', '').ok).toBe(false);
@@ -34,7 +40,7 @@ describe('parseSet', () => {
 
   it('rejects bad rpe', () => {
     for (const rpe of ['11', '0', '7.3', 'x']) {
-      expect(parseSet('60', '8', rpe)).toEqual({ ok: false, error: 'RPE must be 1–10' });
+      expect(parseSet('60', '8', rpe)).toEqual({ ok: false, error: 'RPE must be 1–10 in steps of 0.5' });
     }
   });
 });

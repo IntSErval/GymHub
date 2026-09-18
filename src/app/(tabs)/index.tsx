@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Heatmap } from '@/components/Heatmap';
-import { getActiveSession, listSetTimestamps, startSession } from '@/db/queries';
+import { getActiveSession, listSetTimestamps } from '@/db/queries';
 import { buildHeatmap, daysTrained, heatmapStartMs, type HeatCell } from '@/lib/heatmap';
 
 export default function GymHub() {
@@ -27,16 +27,6 @@ export default function GymHub() {
     }, [db])
   );
 
-  async function onStart() {
-    try {
-      await startSession(db);
-      router.push('/workout');
-    } catch (e) {
-      console.warn(e);
-      Alert.alert('Could not start workout', String(e));
-    }
-  }
-
   const days = daysTrained(cells);
 
   return (
@@ -45,7 +35,8 @@ export default function GymHub() {
       <Text style={styles.caption}>
         {days} {days === 1 ? 'day' : 'days'} trained
       </Text>
-      <Pressable style={styles.button} onPress={onStart} accessibilityRole="button">
+      {/* The session row is created on the first logged set, not here. */}
+      <Pressable style={styles.button} onPress={() => router.push('/workout')} accessibilityRole="button">
         <Text style={styles.buttonText}>{hasActive ? 'Resume workout' : 'Start workout'}</Text>
       </Pressable>
     </View>

@@ -20,6 +20,7 @@ import {
   finishSession,
   getActiveSession,
   listSessionSets,
+  startSession,
   type Exercise,
   type SessionSet,
 } from '@/db/queries';
@@ -39,6 +40,7 @@ export default function Workout() {
   const [saving, setSaving] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  const [mountedAt] = useState(() => Date.now());
 
   const reload = useCallback(async (sessionId: number) => {
     setSets(await listSessionSets(db, sessionId));
@@ -47,7 +49,8 @@ export default function Workout() {
   useEffect(() => {
     getActiveSession(db)
       .then(async (active) => {
-        if (!active) return router.back();
+        // No active session means nothing is logged yet; the row is created on the first set.
+        if (!active) return;
         setSession(active);
         await reload(active.id);
       })
@@ -81,11 +84,13 @@ export default function Workout() {
   }
 
   function setField(group: Group, field: keyof Inputs, value: string) {
-    setInputs((cur) => ({ ...cur, [group.exercise.id]: { ...inputsFor(group), [field]: value } }));
+    const id = group.exercise.id;
+    // Base the update on `cur`, not the render closure, or batched edits overwrite each other.
+    setInputs((cur) => ({ ...cur, [id]: { ...(cur[id] ?? inputsFor(group)), [field]: value } }));
   }
 
   async function onAdd(group: Group) {
-    if (!session || saving) return;
+    if (saving) return;
     const current = inputsFor(group);
     const parsed = parseSet(current.kg, current.reps, current.rpe);
     const id = group.exercise.id;
@@ -95,10 +100,14 @@ export default function Workout() {
     }
     setSaving(true);
     try {
-      await addSet(db, { sessionId: session.id, exerciseId: id, ...parsed.value });
+      // Created here rather than on "Start workout", so an abandoned workout leaves no empty session.
+      const sessionId = session?.id ?? (await startSession(db));
+      if (!session) setSession({ id: sessionId, startedAt: mountedAt });
+      await addSet(db, { sessionId, exerciseId: id, ...parsed.value });
       setErrors((cur) => ({ ...cur, [id]: '' }));
-      setInputs((cur) => ({ ...cur, [id]: { ...current, rpe: '' } }));
-      await reload(session.id);
+      // Keep whatever was typed while saving; only clear RPE.
+      setInputs((cur) => (cur[id] ? { ...cur, [id]: { ...cur[id], rpe: '' } } : cur));
+      await reload(sessionId);
     } catch (e) {
       console.warn(e);
       Alert.alert('Could not save', String(e));
@@ -119,7 +128,7 @@ export default function Workout() {
   }
 
   async function onFinish() {
-    if (!session) return;
+    if (!session) return router.back();
     try {
       await finishSession(db, session.id);
       router.back();
@@ -134,7 +143,7 @@ export default function Workout() {
     setPickerOpen(false);
   }
 
-  const minutes = session ? Math.max(0, Math.floor((now - session.startedAt) / 60_000)) : 0;
+  const minutes = Math.max(0, Math.floor((now - (session?.startedAt ?? mountedAt)) / 60_000));
 
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
