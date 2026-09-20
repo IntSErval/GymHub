@@ -19,6 +19,15 @@ export async function addExercise(db: SQLiteDatabase, name: string, muscles: Mus
   const trimmed = name.trim();
   if (!trimmed) throw new Error('Enter a name');
   if (muscles.length === 0) throw new Error('Pick at least one muscle');
+  // Pre-check instead of catching the UNIQUE violation: the driver's constraint
+  // message differs per platform ("UNIQUE constraint failed" on native,
+  // "Error finalizing statement" on web), so sniffing it is unreliable.
+  // The UNIQUE index is still the real guard.
+  const clash = await db.getFirstAsync<{ id: number }>(
+    'SELECT id FROM exercises WHERE name = ? COLLATE NOCASE',
+    trimmed
+  );
+  if (clash) throw new Error('Exercise already exists');
   const result = await db.runAsync(
     'INSERT INTO exercises (name, muscles) VALUES (?, ?)',
     trimmed,

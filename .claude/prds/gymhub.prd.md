@@ -64,4 +64,4 @@ We'll know we're right when **I log ≥5 days/week for 4 straight weeks**.
 | Local data loss | Low | High | TBD — export/backup |
 
 ---
-*Status: DRAFT — requirements only. Implementation planning pending via /plan.*
+*Status: Milestone 1 built (2026-09-17), post-review bug fixes and web fix landed 2026-09-18; on-device check pending. Milestones 2–7 not started.*

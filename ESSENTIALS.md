@@ -2,29 +2,29 @@
 
 ## MVP Checklist
 ### Home
-- [ ] Today's workout
-- [ ] Water log
-- [ ] Calorie log
-- [ ] Weight log
+- [ ] Today's workout — no separate Home screen exists yet; the single tab (`src/app/(tabs)/index.tsx`, titled "Gym Hub") shows the heat map and a Start/Resume workout button, which covers this need for now
+- [ ] Water log — not implemented
+- [ ] Calorie log — not implemented
+- [ ] Weight log — not implemented
 
 ### Gym Hub
-- [ ] Workout logger (kg, reps, RPE)
-- [ ] Add / remove sets
-- [ ] Exercise library with muscle tags
-- [ ] Heat map
+- [x] Workout logger (kg, reps, RPE) — `src/app/workout.tsx`, `src/lib/sets.ts` (`parseSet`)
+- [x] Add / remove sets — `addSet`/`deleteSet` in `src/db/queries.ts`, wired to `onAdd`/`onDelete` in `workout.tsx`
+- [x] Exercise library with muscle tags — `src/components/ExercisePicker.tsx`, `src/lib/muscles.ts`, `addExercise`/`listExercises`
+- [x] Heat map — `src/components/Heatmap.tsx`, `src/lib/heatmap.ts`, wired into `index.tsx`
 
 ### Nutrition
-- [ ] Manual meal log
-- [ ] Food library
-- [ ] Barcode lookup (Open Food Facts)
-- [ ] Water log
+- [ ] Manual meal log — not implemented (no nutrition screens or tables yet)
+- [ ] Food library — not implemented
+- [ ] Barcode lookup (Open Food Facts) — not implemented
+- [ ] Water log — not implemented
 
 ## Core Flows
-- Log a set
-- Finish a session
-- Log a meal
-- Log water
-- Log weight
+- Log a set — done
+- Finish a session — done (`finishSession`; empty sessions are deleted instead of saved)
+- Log a meal — not implemented
+- Log water — not implemented
+- Log weight — not implemented
 
 ## Screens (outline)
 - Home

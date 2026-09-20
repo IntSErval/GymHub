@@ -83,7 +83,14 @@ Data is stored locally in SQLite with a `user_version` migration.
 | `src/lib/__tests__/sets.test.ts` | 7 | valid set, null RPE, comma decimals, 0 kg, whitespace, bad kg/reps/RPE |
 | `src/lib/__tests__/heatmap.test.ts` | 7 | level buckets, local-date keys, 17×7 shape, Sunday start, future days, same-day counting, out-of-window timestamps |
 
+## Post-implementation updates (2026-09-18)
+Snapshot above is as first built. Since then (commits `cda32f3`, `83f5a4a`):
+- **Code-review bug fixes:** the session row is now created on the first logged set (abandoned workouts leave nothing behind); timer counts from screen mount; batched text-input edits no longer overwrite each other; double-tap protection on Add and on the picker's "Save & add"; RPE error reads "RPE must be 1–10 in steps of 0.5"; comma decimals ("62,5") accepted while grouped input ("1,000") is rejected.
+- **Web fix:** `metro.config.js` (`.wasm` asset + COOP/COEP headers) and `.env` (`EXPO_NO_METRO_LAZY=1`) so `expo-sqlite` runs on web.
+- **Tests:** now 15 (added a grouped-number rejection case).
+- **Line counts** in the table above are stale (`workout.tsx` 248, `index.tsx` 51, `ExercisePicker.tsx` 135, `sets.ts` 30).
+
 ## Next Steps
-- [ ] Run the plan's manual checklist on a device (`npx expo start` → Expo Go)
-- [ ] Code review via `/code-review`
-- [ ] Commit (`/prp-commit`). Nothing is committed yet, and the repo has no commits.
+- [ ] Run the plan's manual checklist on a device (`npx expo start` → Expo Go, SDK 57)
+- [x] Code review — done; fixes in `cda32f3`
+- [x] Commit — done (`cda32f3`, `83f5a4a`)

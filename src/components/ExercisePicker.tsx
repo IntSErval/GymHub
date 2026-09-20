@@ -46,7 +46,7 @@ export function ExercisePicker({ visible, onClose, onPick }: Props) {
       setNewMuscles([]);
       setError('');
     } catch (e) {
-      setError(String(e).includes('UNIQUE') ? 'Exercise already exists' : e instanceof Error ? e.message : String(e));
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setSaving(false);
     }
