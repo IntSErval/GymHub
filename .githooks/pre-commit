@@ -1,0 +1,12 @@
+#!/bin/sh
+# Blocks commits whose staged additions contain private keys or common API tokens.
+# Enable once per clone: git config core.hooksPath .githooks
+# ponytail: regex scan of the staged diff; swap for gitleaks if patterns grow.
+hits=$(git diff --cached -U0 --no-color | grep '^+' | grep -nE \
+  'BEGIN [A-Z ]*PRIVATE KEY|sk-ant-[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9]{32,}|AIza[0-9A-Za-z_-]{35}|gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{40,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}|GOCSPX-[A-Za-z0-9_-]{20,}')
+if [ -n "$hits" ]; then
+  echo "pre-commit: possible secret in staged changes — commit blocked." >&2
+  echo "$hits" | cut -c1-80 >&2
+  echo "If this is a false positive: git commit --no-verify" >&2
+  exit 1
+fi

@@ -31,9 +31,12 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
 
-# SSH keys (never commit these — see incident in cda32f3)
+# SSH keys (never commit these — a key named `y` leaked once and was purged from history)
+/y
+/y.pub
 id_rsa
 id_rsa.pub
 id_ed25519
