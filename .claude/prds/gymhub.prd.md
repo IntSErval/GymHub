@@ -40,8 +40,8 @@ We'll know we're right when **I log ≥5 days/week for 4 straight weeks**.
 | # | Milestone | Outcome | Status | Plan |
 |---|---|---|---|---|
 | 1 | Workout logging | Log sets with kg/reps/RPE, add/remove sets, see heat map | complete (device check pending) | `.claude/PRPs/plans/completed/workout-logging.plan.md` · `.claude/PRPs/reports/workout-logging-report.md` |
-| 2 | Home daily log | Today's workout + water, calories, weight on Home | pending | — |
-| 3 | Nutrition basics | Manual meal log, food library, barcode lookup | pending | — |
+| 2 | Home daily log | Today's workout + water, calories, weight on Home | complete (device check pending) | branch `feat/m2-m3-home-nutrition` |
+| 3 | Nutrition basics | Manual meal log, food library, barcode lookup | complete (device check pending: camera scan) | branch `feat/m2-m3-home-nutrition` |
 | 4 | Muscle volume engine | Muscle activity, split map, recovery views | pending | — |
 | 5 | Progression & RPE stats | Strength trends, RPE breakdown | pending | — |
 | 6 | AI meal log / photo scan | Log a meal from text or a photo | pending | — |
@@ -64,4 +64,4 @@ We'll know we're right when **I log ≥5 days/week for 4 straight weeks**.
 | Local data loss | Low | High | TBD — export/backup |
 
 ---
-*Status: Milestone 1 built (2026-09-17), post-review bug fixes and web fix landed 2026-09-18; on-device check pending. Milestones 2–7 not started.*
+*Status: Milestone 1 built (2026-09-17), post-review bug fixes and web fix landed 2026-09-18. Milestones 2–3 built 2026-09-30 (web-verified); on-device checks pending for M1–M3. Milestones 4–7 not started.*

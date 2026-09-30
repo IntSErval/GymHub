@@ -8,12 +8,10 @@ Personal gym + nutrition tracker. Mobile, local-first, single user.
 - Routing: expo-router (`src/app/`)
 
 ## Tabs
-Target design (MVP):
-- Home — today's workout, water, calories, weight
-- Gym Hub — workout logger, exercise library, heat map
-- Nutrition — meal log, food library, barcode lookup, water
-
-**Built so far:** only one tab, "Gym Hub" (`src/app/(tabs)/index.tsx`): heat map + Start/Resume workout. The workout screen (`src/app/workout.tsx`) and exercise picker modal are pushed on top of it. Home and Nutrition don't exist yet.
+All three MVP tabs are built (`src/app/(tabs)/`):
+- Home (`index.tsx`) — today's workout, water, calories, latest weight
+- Gym Hub (`gym.tsx`) — heat map + Start/Resume workout; `src/app/workout.tsx` and the exercise picker are pushed on top
+- Nutrition (`nutrition.tsx`) — today's meals + kcal, water. `src/app/food-picker.tsx` (modal: search, custom food, grams) and `src/app/scan.tsx` (expo-camera barcode scan; typed barcode on web) sit on top. Barcode lookup: local `food_items` → Open Food Facts → custom-food form prefilled.
 
 ## Commands
 - Start: `npx expo start`
@@ -26,12 +24,15 @@ Target design (MVP):
 - Units: kg
 
 ## Data Model
-Built (schema v1, `src/db/schema.ts`):
+Schema v2 (`src/db/schema.ts`):
 - `exercises` (name unique NOCASE, muscles JSON array) — 30 seeded in the migration
 - `sessions` (started_at, finished_at NULL = active) — created on the first logged set; finishing an empty session deletes it
 - `sets` (session_id, exercise_id, kg, reps, rpe nullable, created_at) — cascade-deleted with the session
+- `water_entries` (ml, created_at) · `weight_entries` (kg, created_at)
+- `food_items` (name, barcode unique nullable, kcal_per_100g, protein/carbs/fat per 100g nullable, source `custom`|`off`)
+- `meal_entries` (food_id, grams, created_at) — kcal is derived (`grams * kcal_per_100g / 100`), never stored
 
-Planned, not built: FoodItem · MealEntry · WaterEntry · WeightEntry
+Queries: `src/db/queries.ts` (workout), `src/db/daily.ts` (water, weight, day totals), `src/db/nutrition.ts` (foods, meals). Day ranges come from `dayRangeMs` in `src/lib/day.ts`.
 
 ## Web dev quirks (Expo SDK 57)
 expo-sqlite's web build loads SQLite in a Web Worker, which only resolves when Metro emits split chunks. Two settings keep that working:
