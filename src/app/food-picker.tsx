@@ -1,9 +1,9 @@
 import { Text, View } from 'react-native';
 
-export default function Home() {
+export default function FoodPicker() {
   return (
     <View>
-      <Text>Home</Text>
+      <Text>Add food</Text>
     </View>
   );
 }

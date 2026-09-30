@@ -1,9 +1,9 @@
 import { Text, View } from 'react-native';
 
-export default function Home() {
+export default function Scan() {
   return (
     <View>
-      <Text>Home</Text>
+      <Text>Scan barcode</Text>
     </View>
   );
 }
