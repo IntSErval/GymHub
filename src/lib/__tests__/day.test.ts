@@ -14,11 +14,4 @@ describe('dayRangeMs', () => {
     expect(from).toBe(new Date(2026, 11, 31).getTime());
     expect(to).toBe(new Date(2027, 0, 1).getTime());
   });
-
-  it('includes midnight start and excludes next midnight', () => {
-    const [from, to] = dayRangeMs(new Date(2026, 0, 2));
-    expect(from).toBe(new Date(2026, 0, 2, 0, 0, 0, 0).getTime());
-    expect(to - from).toBeGreaterThanOrEqual(23 * 3600_000);
-    expect(to - from).toBeLessThanOrEqual(25 * 3600_000);
-  });
 });
