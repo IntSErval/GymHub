@@ -3,10 +3,13 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
+    "@react-three/fiber": "^9.8.1",
+    "animejs": "^4.5.0",
     "expo": "~57.0.24",
     "expo-camera": "~57.0.6",
     "expo-constants": "~57.0.19",
     "expo-font": "~57.0.4",
+    "expo-gl": "~57.0.2",
     "expo-linking": "~57.0.10",
     "expo-router": "~57.0.22",
     "expo-splash-screen": "~57.0.9",
@@ -21,11 +24,13 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "react-native-web": "~0.21.0",
-    "react-native-worklets": "0.10.1"
+    "react-native-worklets": "0.10.1",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@types/react": "~19.2.2",
+    "@types/three": "^0.186.0",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.2",
     "jest": "~29.7.0",
