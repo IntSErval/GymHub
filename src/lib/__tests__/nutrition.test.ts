@@ -74,6 +74,19 @@ describe('fromOpenFoodFacts', () => {
     expect(fromOpenFoodFacts(json, '1')).toMatchObject({ kcalPer100g: 0, proteinG: null, carbsG: null, fatG: null });
   });
 
+  it('nulls macros outside 0–100 g', () => {
+    const json = {
+      status: 1,
+      product: { product_name: 'X', nutriments: { 'energy-kcal_100g': 100, proteins_100g: 101, carbohydrates_100g: -1, fat_100g: 5 } },
+    };
+    expect(fromOpenFoodFacts(json, '1')).toMatchObject({ proteinG: null, carbsG: null, fatG: 5 });
+  });
+
+  it('rejects kcal above 900 (kJ entered as kcal)', () => {
+    const json = { status: 1, product: { product_name: 'X', nutriments: { 'energy-kcal_100g': 2255 } } };
+    expect(fromOpenFoodFacts(json, '1')).toBeNull();
+  });
+
   it('returns null for not-found, missing name or missing kcal', () => {
     expect(fromOpenFoodFacts({ code: '0', status: 0, status_verbose: 'product not found' }, '0')).toBeNull();
     expect(fromOpenFoodFacts({ status: 1 }, '1')).toBeNull();

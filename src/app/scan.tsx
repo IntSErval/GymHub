@@ -29,12 +29,20 @@ export default function Scan() {
     try {
       if (!(await findFoodByBarcode(db, code))) {
         let json: unknown = null;
+        // AbortSignal.timeout isn't reliable in React Native; a timeout aborts into the offline fallback.
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
         try {
-          const res = await fetch(`${OFF_URL}${code}.json?fields=product_name,nutriments`);
+          const res = await fetch(`${OFF_URL}${code}.json?fields=product_name,nutriments`, {
+            headers: { 'User-Agent': 'GymHub/1.0' },
+            signal: controller.signal,
+          });
           json = await res.json(); // not-found is a 404 with a JSON body (status 0)
         } catch (e) {
           console.warn(e);
           Alert.alert('Could not reach Open Food Facts', 'Enter the food details yourself; the barcode is kept.');
+        } finally {
+          clearTimeout(timer);
         }
         const food = fromOpenFoodFacts(json, code);
         if (food) await addFood(db, food, 'off');

@@ -22,20 +22,32 @@ export default function FoodPicker() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    searchFoods(db, query).then(setFoods, (e) => setError(String(e)));
+    let live = true; // drop responses that arrive after a newer query
+    searchFoods(db, query).then(
+      (list) => live && setFoods(list),
+      (e) => live && setError(String(e))
+    );
+    return () => {
+      live = false;
+    };
   }, [db, query, selected]); // selected: refresh after a food was created or scanned in
 
   useEffect(() => {
     if (!barcode) return;
+    let live = true;
     findFoodByBarcode(db, barcode).then(
       (food) => {
+        if (!live) return;
         setError('');
         setSelected(food);
         setGrams('');
         setForm(food ? null : { ...EMPTY_FORM, barcode });
       },
-      (e) => setError(String(e))
+      (e) => live && setError(String(e))
     );
+    return () => {
+      live = false;
+    };
   }, [db, barcode, t]);
 
   function pick(food: Food) {
@@ -75,7 +87,11 @@ export default function FoodPicker() {
       router.back();
     });
 
-  const errorText = error ? <Text style={styles.error}>{error}</Text> : null;
+  const errorText = error ? (
+    <Text style={styles.error} accessibilityRole="alert" accessibilityLiveRegion="polite">
+      {error}
+    </Text>
+  ) : null;
 
   if (selected) {
     const parsed = parseGrams(grams);

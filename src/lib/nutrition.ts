@@ -59,6 +59,10 @@ export function parseFoodForm(form: {
 }
 
 const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+const macro = (v: unknown) => {
+  const g = num(v);
+  return g !== null && g >= 0 && g <= 100 ? g : null;
+};
 
 /** Maps an Open Food Facts v2 product response; null when there's nothing usable to log. */
 export function fromOpenFoodFacts(json: unknown, barcode: string): FoodInput | null {
@@ -67,14 +71,14 @@ export function fromOpenFoodFacts(json: unknown, barcode: string): FoodInput | n
   const name = typeof res.product.product_name === 'string' ? res.product.product_name.trim() : '';
   const n = res.product.nutriments ?? {};
   const kcal = num(n['energy-kcal_100g']);
-  // Negative kcal would violate the table CHECK; treat it as unusable like a missing value.
-  if (!name || kcal === null || kcal < 0) return null;
+  // Negative kcal violates the table CHECK; > 900 is almost always kJ entered as kcal.
+  if (!name || kcal === null || kcal < 0 || kcal > 900) return null;
   return {
     name,
     kcalPer100g: kcal,
-    proteinG: num(n.proteins_100g),
-    carbsG: num(n.carbohydrates_100g),
-    fatG: num(n.fat_100g),
+    proteinG: macro(n.proteins_100g),
+    carbsG: macro(n.carbohydrates_100g),
+    fatG: macro(n.fat_100g),
     barcode,
   };
 }
