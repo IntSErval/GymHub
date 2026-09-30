@@ -33,7 +33,13 @@
           "imageWidth": 76
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow GymHub to scan food barcodes."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

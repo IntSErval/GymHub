@@ -1,7 +1,7 @@
 export type SetInput = { kg: number; reps: number; rpe: number | null };
 export type ParseResult = { ok: true; value: SetInput } | { ok: false; error: string };
 
-const toNumber = (text: string) => {
+export const toNumber = (text: string) => {
   const trimmed = text.trim();
   // A comma is a decimal separator ("62,5"). Grouped input like "1,000" is rejected, not read as 1.
   const normalized = /^\d+,\d{1,2}$/.test(trimmed) ? trimmed.replace(',', '.') : trimmed;

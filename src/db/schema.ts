@@ -41,4 +41,42 @@ export async function migrate(db: SQLiteDatabase) {
       await db.execAsync('PRAGMA user_version = 1');
     });
   }
+
+  if (version < 2) {
+    await db.withTransactionAsync(async () => {
+      await db.execAsync(`
+        CREATE TABLE water_entries (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          ml INTEGER NOT NULL CHECK (ml > 0),
+          created_at INTEGER NOT NULL
+        );
+        CREATE TABLE weight_entries (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          kg REAL NOT NULL CHECK (kg > 0),
+          created_at INTEGER NOT NULL
+        );
+        -- Macros are per 100 g. source: 'off' = Open Food Facts.
+        CREATE TABLE food_items (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          barcode TEXT UNIQUE,
+          kcal_per_100g REAL NOT NULL CHECK (kcal_per_100g >= 0),
+          protein_g REAL,
+          carbs_g REAL,
+          fat_g REAL,
+          source TEXT NOT NULL CHECK (source IN ('custom','off'))
+        );
+        CREATE TABLE meal_entries (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          food_id INTEGER NOT NULL REFERENCES food_items(id),
+          grams REAL NOT NULL CHECK (grams > 0),
+          created_at INTEGER NOT NULL
+        );
+        CREATE INDEX idx_water_created ON water_entries(created_at);
+        CREATE INDEX idx_weight_created ON weight_entries(created_at);
+        CREATE INDEX idx_meals_created ON meal_entries(created_at);
+      `);
+      await db.execAsync('PRAGMA user_version = 2');
+    });
+  }
 }
